@@ -10,6 +10,18 @@ Gmail·SNU eTL에 흩어진 할 일을 AI가 수집·필터링해 아침 브리�
 
 사용자는 결과를 검토하고 승인하는 감독자(Supervisor) 역할을 수행하시면 됩니다.
 
+## 스크린샷
+
+| 아침 브리핑 & AI 코치 | eTL 과제 현황 |
+|---|---|
+| ![morning](screenshots/01_morning_briefing.png) | ![etl](screenshots/02_etl_tasks.png) |
+
+| Gmail 할 일 & 초안 작성 버튼 | 초안 생성 중 | 초안 완성 & 저장 |
+|---|---|---|
+| ![gmail](screenshots/03_gmail_tasks.png) | ![generating](screenshots/04_draft_generating.png) | ![draft](screenshots/05_draft_ready.png) |
+
+---
+
 ## 시작하기
 
 **Mac / Linux**
