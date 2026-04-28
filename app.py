@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PYTHON = sys.executable
 CHECKED_FILE = os.path.join(BASE_DIR, "checked_tasks.json")
 
-st.set_page_config(page_title="DrCoach 🥼", page_icon="🥼", layout="wide")
+st.set_page_config(page_title="DrCoach", page_icon="🥼", layout="wide")
 
 # ── 세션 상태 초기화 ─────────────────────────────────────────
 for key in ["etl_proc", "gmail_proc", "fetch_gmail_proc", "fetch_etl_proc"]:
@@ -668,26 +668,40 @@ def main():
         req_tasks   = gmail_data.get("required_tasks", [t for t in all_tasks if t.get("task_type") == "required"])
         opt_tasks   = gmail_data.get("optional_tasks", [t for t in all_tasks if t.get("task_type") == "optional"])
 
+        rendered_ids = set()
+
+        def _task_uid(t):
+            msg_id = t.get("source_message_id") or ""
+            return make_task_id(f"{msg_id}__{t.get('task','')}", "gmail")
+
+        def render_once(t):
+            uid = _task_uid(t)
+            if uid in rendered_ids:
+                return
+            rendered_ids.add(uid)
+            render_gmail_task_card(t)
+
         # 오늘 마감
         if today_tasks:
             st.markdown("#### 🔴 오늘 마감")
             for t in today_tasks:
-                render_gmail_task_card(t)
+                render_once(t)
         else:
             st.success("오늘 마감인 Gmail 할 일이 없습니다.")
 
         # 필수 항목 (오늘 제외)
-        req_not_today = [t for t in req_tasks if t not in today_tasks]
+        req_not_today = [t for t in req_tasks if _task_uid(t) not in rendered_ids]
         if req_not_today:
             st.markdown("#### 🟠 필수 확인 · 대응 필요")
             for t in req_not_today:
-                render_gmail_task_card(t)
+                render_once(t)
 
         # 선택 항목
-        if opt_tasks:
-            with st.expander(f"🟡 선택 항목 ({len(opt_tasks)}개)", expanded=False):
-                for t in opt_tasks:
-                    render_gmail_task_card(t)
+        opt_not_shown = [t for t in opt_tasks if _task_uid(t) not in rendered_ids]
+        if opt_not_shown:
+            with st.expander(f"🟡 선택 항목 ({len(opt_not_shown)}개)", expanded=False):
+                for t in opt_not_shown:
+                    render_once(t)
     else:
         st.warning("Gmail 데이터를 불러올 수 없습니다.")
 
