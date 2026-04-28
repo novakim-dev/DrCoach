@@ -1,6 +1,15 @@
 # DrCoach 🥼
 
-Gmail과 SNU eTL 할 일을 한 화면에서 확인하고, 매일 아침 증거 기반 AI 코칭을 받는 개인 대시보드.
+> 일을 테트리스처럼 채우는 대신, 당신의 삶에 여백을 설계하세요.
+
+'수행하는 나(Doer)'에서 '계획하는 나(Planner)'로 이끄는 디지털 동료.
+
+Gmail·SNU eTL에 흩어진 할 일을 AI가 수집·필터링해 아침 브리핑으로 전달하고,
+매일 아침 당신 곁의 디지털 주치의가 CBT·MBSR·ACT 등 임상 검증된 심리학을 처방전 삼아
+오늘 하루를 위한 자기성찰 질문 하나를 건넵니다. 빈틈없이 채운 일정 대신, 의미 있는 여백을 의도적으로 설계합니다.
+
+사용자는 직접 실무를 뛰는 대신, AI가 정리한 결과를 검토하고 승인하는
+감독자(Supervisor) 역할만 수행합니다.
 
 ## 시작하기
 
@@ -36,7 +45,8 @@ streamlit run app.py
 1. 사이드바 **eTL 로그인** → Chromium 브라우저에서 SNU 계정 로그인
 2. eTL 메인 화면 진입 시 자동 저장
 
-**4. 수강 과목 설정** — `analyze_etl_modules.py` 상단 `COURSE_IDS` / `COURSE_NAMES`를 본인 과목으로 교체
+**4. 수강 과목 설정** — `analyze_etl_modules.py` 상단
+`COURSE_IDS` / `COURSE_NAMES`를 본인 과목으로 교체
 
 ---
 
@@ -44,6 +54,6 @@ streamlit run app.py
 
 아래 파일은 개인 인증 정보입니다. 절대 공유하지 마세요.
 
-- `.env` · `credentials.json` · `token.json` · `etl_auth.json`
+`.env` · `credentials.json` · `token.json` · `etl_auth.json`
 
 모두 `.gitignore`에 포함되어 있습니다.
