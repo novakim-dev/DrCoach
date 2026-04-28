@@ -1,0 +1,26 @@
+# 개인 인증 파일 (절대 공유 금지)
+.env
+credentials.json
+token.json
+etl_auth.json
+
+# 데이터 캐시
+gmail_tasks.json
+today_tasks.json
+checked_tasks.json
+
+# 신호/로그 파일
+_etl_save_now.txt
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# macOS
+.DS_Store
+
+# bkit
+.bkit/
