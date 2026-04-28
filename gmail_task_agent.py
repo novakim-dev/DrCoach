@@ -95,8 +95,11 @@ else:
     client = None
     FALLBACK_MODELS = []
 
-# Gmail 권한 범위 (읽기 전용)
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+# Gmail 권한 범위
+SCOPES = [
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/gmail.compose',
+]
 
 from google.auth.exceptions import RefreshError
 

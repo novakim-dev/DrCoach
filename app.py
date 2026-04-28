@@ -8,11 +8,17 @@ import hashlib
 from datetime import datetime
 from dotenv import load_dotenv, set_key
 
+try:
+    from gmail_draft_agent import generate_draft_text, save_draft, get_gmail_service as _get_draft_service
+    DRAFT_AVAILABLE = True
+except Exception:
+    DRAFT_AVAILABLE = False
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PYTHON = sys.executable
 CHECKED_FILE = os.path.join(BASE_DIR, "checked_tasks.json")
 
-st.set_page_config(page_title="Daily Briefing", page_icon="📋", layout="wide")
+st.set_page_config(page_title="DrCoach 🥼", page_icon="🥼", layout="wide")
 
 # ── 세션 상태 초기화 ─────────────────────────────────────────
 for key in ["etl_proc", "gmail_proc", "fetch_gmail_proc", "fetch_etl_proc"]:
@@ -452,7 +458,9 @@ def render_gmail_task_card(task):
     due    = task.get("due_date", "")
     reason = task.get("reason", "")
 
-    task_id = make_task_id(title, "gmail")
+    # message_id + task 내용 조합으로 완전 유니크 키 생성
+    msg_id  = task.get("source_message_id") or ""
+    task_id = make_task_id(f"{msg_id}__{title}", "gmail")
     is_done = task_id in st.session_state.checked_tasks
 
     if ttype == "required":
@@ -499,6 +507,47 @@ def render_gmail_task_card(task):
       {reason_html}
     </div>
     """, unsafe_allow_html=True)
+
+    # ── 초안 작성 UI (reply 가능한 메일만)
+    has_source = bool(task.get("source_message_id") and task.get("source_from"))
+    if DRAFT_AVAILABLE and has_source and not is_done:
+        draft_key  = f"draft_{task_id}"
+        status_key = f"draft_status_{task_id}"
+
+        if draft_key not in st.session_state:
+            st.session_state[draft_key] = ""
+        if status_key not in st.session_state:
+            st.session_state[status_key] = ""
+
+        btn_col, _ = col_card.columns([2, 8])
+        if btn_col.button("✍️ 초안 작성", key=f"gen_{task_id}"):
+            with st.spinner("Gemini가 초안을 작성 중..."):
+                try:
+                    st.session_state[draft_key] = generate_draft_text(task)
+                    st.session_state[status_key] = ""
+                except Exception as e:
+                    st.session_state[status_key] = f"오류: {e}"
+
+        if st.session_state[draft_key]:
+            edited = col_card.text_area(
+                "초안 (수정 가능)",
+                value=st.session_state[draft_key],
+                height=160,
+                key=f"ta_{task_id}"
+            )
+            save_col, _ = col_card.columns([3, 7])
+            if save_col.button("📨 Gmail 임시보관함에 저장", key=f"save_{task_id}"):
+                with st.spinner("저장 중..."):
+                    try:
+                        svc = _get_draft_service()
+                        draft_id = save_draft(svc, task, edited)
+                        st.session_state[status_key] = f"✅ 저장 완료 (draft_id: {draft_id[:8]}...)"
+                        st.session_state[draft_key] = ""
+                    except Exception as e:
+                        st.session_state[status_key] = f"❌ 저장 실패: {e}"
+
+        if st.session_state[status_key]:
+            col_card.caption(st.session_state[status_key])
 
 
 def main():
